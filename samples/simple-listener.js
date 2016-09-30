@@ -4,6 +4,8 @@ var qStorageAccount     = '<<YOURACCOUNTNAME>>';
 var qStorageSecret      = '<<YOURACCOUNTSECRET>>';
 var qPolling            = 2;
 
+var q = require('q');
+
 // load the module
 var azureQueueClient = require('../lib/azure-queue-client.js');
 
@@ -11,13 +13,17 @@ var azureQueueClient = require('../lib/azure-queue-client.js');
 var queueListener = new azureQueueClient.AzureQueueListener();
 
 // establish a message handler
-queueListener.onMessage(function(message) {
-
+queueListener.onMessage(function (message) {
+    var defer = q.defer();
     // log something
+    if (message) {
     console.log('Message received: ' + JSON.stringify(message));
-
+        defer.resolve(message);
+    } else {
+        defer.reject(error);
+    }
     // done without errors
-    return queueListener.done();
+    return defer.promise;
 });
 
 // start the listening
